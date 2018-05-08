@@ -1,5 +1,7 @@
 package com.pl.masterthesis.models;
 
+import java.util.Objects;
+
 public final class Connection {
     private String ipAddress;
     private Interface firstInterface;
@@ -33,5 +35,17 @@ public final class Connection {
 
     public void setSecondInterface(Interface secondInterface) {
         this.secondInterface = secondInterface;
+    }
+
+    public void transferPackage(Interface sourceInterface, Package packageToTransfer) {
+        Objects.requireNonNull(sourceInterface, "sourceInterface cannot be null");
+        if(ipAddress.equals(packageToTransfer.getDestination())) {
+            packageToTransfer.setReachedDestination(true);
+        }
+        if (sourceInterface.equals(firstInterface)) {
+            secondInterface.receivePackage(packageToTransfer);
+        } else {
+            firstInterface.receivePackage(packageToTransfer);
+        }
     }
 }

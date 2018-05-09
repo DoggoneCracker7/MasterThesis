@@ -1,6 +1,7 @@
 package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.utils.IpAddress;
+import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ public final class Connection {
     private Interface firstInterface;
     private Interface secondInterface;
 
-    public Connection(String ipAddress, Interface firstInterface, Interface secondInterface) {
+    public Connection(String ipAddress, Interface firstInterface, Interface secondInterface) throws WrongIpAddressFormatException {
         this.ipAddress = new IpAddress(ipAddress);
         this.firstInterface = firstInterface;
         this.secondInterface = secondInterface;

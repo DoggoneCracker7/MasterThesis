@@ -1,6 +1,7 @@
 package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.utils.IpAddress;
+import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
 public final class RoutingTableRecord {
     private IpAddress ipAddress;
@@ -8,7 +9,7 @@ public final class RoutingTableRecord {
     private Interface routeInterface;
     private int mask;
 
-    public RoutingTableRecord(String ipAddress, int hops, Interface routeInterface) {
+    public RoutingTableRecord(String ipAddress, int hops, Interface routeInterface) throws WrongIpAddressFormatException {
         this.ipAddress = new IpAddress(ipAddress);
         this.hops = hops;
         this.routeInterface = routeInterface;

@@ -1,5 +1,7 @@
 package com.pl.masterthesis.utils;
 
+import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
+
 import java.util.Arrays;
 import java.util.StringJoiner;
 
@@ -9,7 +11,7 @@ public final class IpAddress {
     private short mask;
     private boolean addressPool;
 
-    public IpAddress(String addressAsText) {
+    public IpAddress(String addressAsText) throws WrongIpAddressFormatException {
         String validationMsg = validateGivenAddress(addressAsText);
         if (validationMsg.isEmpty()) {
             String[] splittedAddress = addressAsText.split("\\.");
@@ -18,16 +20,16 @@ public final class IpAddress {
                     Short.valueOf(splittedAddress[2]),
                     Short.valueOf(splittedAddress[3])};
         } else {
-            throw new IllegalArgumentException(validationMsg);
+            throw new WrongIpAddressFormatException(validationMsg);
         }
     }
 
-    public IpAddress(short[] address) {
+    public IpAddress(short[] address) throws WrongIpAddressFormatException {
         String validationMsg = validateGivenAddress(address);
         if (validationMsg.isEmpty()) {
             this.address = new short[]{address[0], address[1], address[2], address[3]};
         } else {
-            throw new IllegalArgumentException(validationMsg);
+            throw new WrongIpAddressFormatException(validationMsg);
         }
     }
 

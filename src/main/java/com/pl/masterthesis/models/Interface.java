@@ -1,6 +1,7 @@
 package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.utils.ConnectionPool;
+import com.pl.masterthesis.utils.IpAddress;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -11,10 +12,10 @@ import java.util.logging.Logger;
 public final class Interface {
     private final Logger logger = Logger.getLogger(getClass().getName());
     private String name;
-    private String ipAddress;
+    private IpAddress ipAddress;
     private Consumer<Package> onReceiveConsumer;
 
-    public Interface(String name, String ipAddress) {
+    public Interface(String name, IpAddress ipAddress) {
         this.name = name;
         this.ipAddress = ipAddress;
     }
@@ -27,11 +28,11 @@ public final class Interface {
         this.name = name;
     }
 
-    public String getIpAddress() {
+    public IpAddress getIpAddress() {
         return ipAddress;
     }
 
-    public void setIpAddress(String ipAddress) {
+    public void setIpAddress(IpAddress ipAddress) {
         this.ipAddress = ipAddress;
     }
 

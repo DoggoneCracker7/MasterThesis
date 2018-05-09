@@ -1,8 +1,9 @@
 package com.pl.masterthesis.models;
 
+import com.pl.masterthesis.utils.exceptions.RouteNotFoundException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,8 +45,8 @@ public final class Router {
         logger.log(Level.INFO, "Router {0} przesyła pakiet {1}", new Object[]{name, packageToSend.getPackageID()});
         try {
             RoutingTableRecord record = routingTable.getRecordByIpAddress(packageToSend.getDestination());
-            record.getSource().sendPackage(packageToSend);
-        } catch (NoSuchElementException e) {
+            record.geRouteInterface().sendPackage(packageToSend);
+        } catch (RouteNotFoundException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
@@ -61,10 +62,12 @@ public final class Router {
         if (receivedPackage.hasReachedDestination()) {
             if (receivedPackage.isAck()) {
                 logger.log(Level.INFO, "Potwierdzenie pakietu o identyfikatorze {0} od {1} dotarło prawidłowo do {2}",
-                        new String[]{receivedPackage.getPackageID(), receivedPackage.getSource(), receivedPackage.getDestination()});
+                        new String[]{receivedPackage.getPackageID(), receivedPackage.getSource().getAddressAsString(),
+                                receivedPackage.getDestination().getAddressAsString()});
             } else {
                 logger.log(Level.INFO, "Pakiet o identyfikatorze {0} dotarł prawidłowo do {1} z {2}",
-                        new String[]{receivedPackage.getPackageID(), receivedPackage.getDestination(), receivedPackage.getSource()});
+                        new String[]{receivedPackage.getPackageID(), receivedPackage.getDestination().getAddressAsString(),
+                                receivedPackage.getSource().getAddressAsString()});
                 sendPackage(getAckMessage(receivedPackage));
             }
         } else {

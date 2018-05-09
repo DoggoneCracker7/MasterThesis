@@ -1,11 +1,13 @@
 package com.pl.masterthesis.models;
 
+import com.pl.masterthesis.utils.IpAddress;
+
 public final class Package<T> {
     private int TTL = 30;
     private int size;
     private T data;
-    private String source;
-    private String destination;
+    private IpAddress source;
+    private IpAddress destination;
     private boolean ack;
     private boolean reachedDestination;
     private String packageID;
@@ -35,19 +37,19 @@ public final class Package<T> {
         this.data = data;
     }
 
-    public String getSource() {
+    public IpAddress getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(IpAddress source) {
         this.source = source;
     }
 
-    public String getDestination() {
+    public IpAddress getDestination() {
         return destination;
     }
 
-    public void setDestination(String destination) {
+    public void setDestination(IpAddress destination) {
         this.destination = destination;
     }
 

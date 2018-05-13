@@ -1,5 +1,6 @@
 package com.pl.masterthesis.models;
 
+import com.pl.masterthesis.models.prototypes.Transmittable;
 import com.pl.masterthesis.utils.IpAddress;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
@@ -7,13 +8,13 @@ import java.util.Objects;
 
 public final class Connection {
     private IpAddress ipAddress;
-    private Interface firstInterface;
-    private Interface secondInterface;
+    private Transmittable firstTransmittable;
+    private Transmittable secondTransmittable;
 
-    public Connection(String ipAddress, Interface firstInterface, Interface secondInterface) throws WrongIpAddressFormatException {
+    public Connection(String ipAddress, Transmittable firstTransmittable, Transmittable secondTransmittable) throws WrongIpAddressFormatException {
         this.ipAddress = new IpAddress(ipAddress);
-        this.firstInterface = firstInterface;
-        this.secondInterface = secondInterface;
+        this.firstTransmittable = firstTransmittable;
+        this.secondTransmittable = secondTransmittable;
     }
 
     public IpAddress getIpAddress() {
@@ -24,31 +25,31 @@ public final class Connection {
         this.ipAddress = ipAddress;
     }
 
-    public Interface getFirstInterface() {
-        return firstInterface;
+    public Transmittable getFirstTransmittable() {
+        return firstTransmittable;
     }
 
-    public void setFirstInterface(Interface firstInterface) {
-        this.firstInterface = firstInterface;
+    public void setFirstTransmittable(Transmittable firstTransmittable) {
+        this.firstTransmittable = firstTransmittable;
     }
 
-    public Interface getSecondInterface() {
-        return secondInterface;
+    public Transmittable getSecondTransmittable() {
+        return secondTransmittable;
     }
 
-    public void setSecondInterface(Interface secondInterface) {
-        this.secondInterface = secondInterface;
+    public void setSecondTransmittable(Transmittable secondTransmittable) {
+        this.secondTransmittable = secondTransmittable;
     }
 
-    public void transferPackage(Interface sourceInterface, Package packageToTransfer) {
-        Objects.requireNonNull(sourceInterface, "sourceInterface cannot be null");
+    public void transferPackage(Transmittable sourceTransmittable, Package packageToTransfer) {
+        Objects.requireNonNull(sourceTransmittable, "sourceTransmittable cannot be null");
         if (ipAddress.equals(packageToTransfer.getDestination())) {
             packageToTransfer.setReachedDestination(true);
         }
-        if (sourceInterface.equals(firstInterface)) {
-            secondInterface.receivePackage(packageToTransfer);
+        if (sourceTransmittable.equals(firstTransmittable)) {
+            secondTransmittable.receivePackage(packageToTransfer);
         } else {
-            firstInterface.receivePackage(packageToTransfer);
+            firstTransmittable.receivePackage(packageToTransfer);
         }
     }
 }

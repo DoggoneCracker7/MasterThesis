@@ -129,7 +129,7 @@ public final class IpAddress {
     }
 
     public boolean containsAddress(IpAddress addressToCheck) {
-        return addressToCheck.getAddress() > address
+        return addressToCheck.getAddress() >= address
                 && addressToCheck.getAddress() < address + getAddressAmount(mask);
     }
 

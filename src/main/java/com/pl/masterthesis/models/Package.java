@@ -76,4 +76,18 @@ public final class Package<T> {
     public void setPackageID(String packageID) {
         this.packageID = packageID;
     }
+
+    public Package changeToAck() {
+        final String confirmMessage = "OK";
+        Package<String> ackPackage = new Package<>();
+
+        ackPackage.setPackageID(packageID);
+        ackPackage.setAck(true);
+        ackPackage.setSource(destination);
+        ackPackage.setDestination(source);
+        ackPackage.setData(confirmMessage);
+        ackPackage.setSize(confirmMessage.length());
+
+        return ackPackage;
+    }
 }

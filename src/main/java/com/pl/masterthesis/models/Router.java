@@ -58,7 +58,8 @@ public final class Router {
     }
 
     private void onReceive(Package receivedPackage) {
-        logger.log(Level.INFO, "Router {0} odebrał pakiet {1}", new Object[]{name, receivedPackage.getPackageID()});
+        logger.log(Level.INFO, "Router {0} odebrał pakiet {1}(cel: {2})",
+                new Object[]{name, receivedPackage.getPackageID(), receivedPackage.getDestination().getAddressAsString()});
         if (receivedPackage.hasReachedDestination()) {
             if (receivedPackage.isAck()) {
                 logger.log(Level.INFO, "Potwierdzenie pakietu o identyfikatorze {0} od {1} dotarło prawidłowo do {2}",
@@ -68,24 +69,10 @@ public final class Router {
                 logger.log(Level.INFO, "Pakiet o identyfikatorze {0} dotarł prawidłowo do {1} z {2}",
                         new String[]{receivedPackage.getPackageID(), receivedPackage.getDestination().getAddressAsString(),
                                 receivedPackage.getSource().getAddressAsString()});
-                sendPackage(getAckMessage(receivedPackage));
+                sendPackage(receivedPackage.changeToAck());
             }
         } else {
             sendPackage(receivedPackage);
         }
-    }
-
-    private Package<String> getAckMessage(Package receivedPackage) {
-        final String confirmMessage = "OK";
-        Package<String> ackPackage = new Package<>();
-
-        ackPackage.setPackageID(receivedPackage.getPackageID());
-        ackPackage.setAck(true);
-        ackPackage.setSource(receivedPackage.getDestination());
-        ackPackage.setDestination(receivedPackage.getSource());
-        ackPackage.setData(confirmMessage);
-        ackPackage.setSize(confirmMessage.length());
-
-        return ackPackage;
     }
 }

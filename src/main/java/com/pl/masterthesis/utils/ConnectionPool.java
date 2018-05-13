@@ -1,7 +1,7 @@
 package com.pl.masterthesis.utils;
 
 import com.pl.masterthesis.models.Connection;
-import com.pl.masterthesis.models.Interface;
+import com.pl.masterthesis.models.prototypes.Transmittable;
 
 import java.util.*;
 
@@ -21,18 +21,18 @@ public final class ConnectionPool {
         connections.addAll(Arrays.asList(connection));
     }
 
-    public Optional<Connection> getConnection(Interface sourceInterface) {
-        Objects.requireNonNull(sourceInterface, "sourceInterface cannot be null");
+    public Optional<Connection> getConnection(Transmittable sourceTransmittable) {
+        Objects.requireNonNull(sourceTransmittable, "sourceTransmittable cannot be null");
         for (Connection connection : connections) {
-            if (connactionContainsInterface(connection, sourceInterface)) {
+            if (connactionContainsTransmittable(connection, sourceTransmittable)) {
                 return Optional.of(connection);
             }
         }
         return Optional.empty();
     }
 
-    private boolean connactionContainsInterface(Connection connection, Interface sourceInterface) {
-        Objects.requireNonNull(sourceInterface, "sourceInterface cannot be null");
-        return sourceInterface.equals(connection.getFirstInterface()) || sourceInterface.equals(connection.getSecondInterface());
+    private boolean connactionContainsTransmittable(Connection connection, Transmittable sourceTransmittable) {
+        Objects.requireNonNull(sourceTransmittable, "sourceTransmittable cannot be null");
+        return sourceTransmittable.equals(connection.getFirstTransmittable()) || sourceTransmittable.equals(connection.getSecondTransmittable());
     }
 }

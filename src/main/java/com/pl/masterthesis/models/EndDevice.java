@@ -4,28 +4,17 @@ import com.pl.masterthesis.models.prototypes.Transmittable;
 import com.pl.masterthesis.utils.ConnectionPool;
 import com.pl.masterthesis.utils.IpAddress;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class Interface implements Transmittable {
+public class EndDevice implements Transmittable {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private String name;
     private IpAddress ipAddress;
-    private Consumer<Package> onReceiveConsumer;
+    private String name;
 
-    public Interface(String name, IpAddress ipAddress) {
-        this.name = name;
+    public EndDevice(IpAddress ipAddress, String name) {
         this.ipAddress = ipAddress;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 
@@ -37,24 +26,33 @@ public final class Interface implements Transmittable {
         this.ipAddress = ipAddress;
     }
 
-    public Consumer<Package> getOnReceiveConsumer() {
-        return onReceiveConsumer;
+    public String getName() {
+        return name;
     }
 
-    public void setOnReceiveConsumer(Consumer<Package> onReceiveConsumer) {
-        this.onReceiveConsumer = onReceiveConsumer;
+    public void setName(String name) {
+        this.name = name;
     }
 
+    @Override
     public void receivePackage(Package receivedPackage) {
-        Objects.requireNonNull(onReceiveConsumer, "onReceiveConsumer cannot be null");
-        onReceiveConsumer.accept(receivedPackage);
+        if (receivedPackage.isAck()) {
+            logger.log(Level.INFO, "Potwierdzenie pakietu o identyfikatorze {0} od {1} dotarło prawidłowo " +
+                    "do urządzenia końcowego o adresie {2}", new String[]{receivedPackage.getPackageID(),
+                    receivedPackage.getSource().getAddressAsString(), receivedPackage.getDestination().getAddressAsString()});
+        } else {
+            logger.log(Level.INFO, "Urządzenie końcowe otrzmało pakiet {0} od {1}",
+                    new String[]{receivedPackage.getPackageID(), receivedPackage.getSource().getAddressAsString()});
+            sendPackage(receivedPackage.changeToAck());
+        }
     }
 
+    @Override
     public void sendPackage(Package packageToSend) {
         Optional<Connection> connection = ConnectionPool.get().getConnection(this);
         if (connection.isPresent()) {
-            logger.log(Level.INFO, "Przez interfejs pod adresem {0} wysyłany jest pakiet {1}(cel: {2})",
-                    new String[]{ipAddress.getAddressAsString(), packageToSend.getPackageID(),
+            logger.log(Level.INFO, "Urządzenie końcowe pod adresem {0}(nazwa {1}) wysyła pakiet {2} pod adres {3}",
+                    new String[]{ipAddress.getAddressAsString(), name, packageToSend.getPackageID(),
                             packageToSend.getDestination().getAddressAsString()});
             connection.get().transferPackage(this, packageToSend);
         } else {

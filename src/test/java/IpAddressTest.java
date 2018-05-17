@@ -1,4 +1,4 @@
-import com.pl.masterthesis.utils.IpAddress;
+import com.pl.masterthesis.models.IpAddress;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 import org.junit.Assert;
 import org.junit.Test;

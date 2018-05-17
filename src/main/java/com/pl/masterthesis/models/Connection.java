@@ -1,7 +1,6 @@
 package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.models.prototypes.Transmittable;
-import com.pl.masterthesis.utils.IpAddress;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
 import java.util.Objects;

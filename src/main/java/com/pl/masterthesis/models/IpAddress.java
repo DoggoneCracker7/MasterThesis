@@ -1,4 +1,4 @@
-package com.pl.masterthesis.utils;
+package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
@@ -154,12 +154,5 @@ public final class IpAddress {
 
         if (address != ipAddress.address) return false;
         return mask == ipAddress.mask;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (address ^ (address >>> 32));
-        result = 31 * result + (int) (mask ^ (mask >>> 32));
-        return result;
     }
 }

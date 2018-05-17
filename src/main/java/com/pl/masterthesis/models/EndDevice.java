@@ -2,7 +2,6 @@ package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.models.prototypes.Transmittable;
 import com.pl.masterthesis.utils.ConnectionPool;
-import com.pl.masterthesis.utils.IpAddress;
 
 import java.util.Optional;
 import java.util.logging.Level;

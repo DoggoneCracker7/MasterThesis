@@ -1,7 +1,5 @@
 package com.pl.masterthesis.models;
 
-import com.pl.masterthesis.utils.IpAddress;
-
 public final class Package<T> {
     private int TTL = 30;
     private int size;

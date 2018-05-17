@@ -1,6 +1,5 @@
 package com.pl.masterthesis.models;
 
-import com.pl.masterthesis.utils.IpAddress;
 import com.pl.masterthesis.utils.exceptions.RouteNotFoundException;
 
 import java.util.ArrayList;

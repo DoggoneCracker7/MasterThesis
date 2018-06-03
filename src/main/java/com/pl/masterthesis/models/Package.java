@@ -9,6 +9,7 @@ public final class Package<T> {
     private boolean ack;
     private boolean reachedDestination;
     private String packageID;
+    private boolean isRoutingTable;
 
 
     public int getTTL() {
@@ -85,7 +86,16 @@ public final class Package<T> {
         ackPackage.setDestination(source);
         ackPackage.setData(confirmMessage);
         ackPackage.setSize(confirmMessage.length());
+        ackPackage.setRoutingTable(isRoutingTable);
 
         return ackPackage;
+    }
+
+    public boolean isRoutingTable() {
+        return isRoutingTable;
+    }
+
+    public void setRoutingTable(boolean routingTable) {
+        isRoutingTable = routingTable;
     }
 }

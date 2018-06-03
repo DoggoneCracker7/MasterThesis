@@ -155,4 +155,9 @@ public final class IpAddress {
         if (address != ipAddress.address) return false;
         return mask == ipAddress.mask;
     }
+
+    @Override
+    public String toString() {
+        return getAddressAsString() + " / " + mask;
+    }
 }

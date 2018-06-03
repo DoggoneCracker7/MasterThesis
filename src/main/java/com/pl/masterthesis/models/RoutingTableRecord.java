@@ -6,12 +6,22 @@ public final class RoutingTableRecord {
     private IpAddress ipAddress;
     private int hops;
     private Interface routeInterface;
-    private int mask;
+    private Interface sourceInterface;
+    private boolean directConnection;
 
     public RoutingTableRecord(String ipAddress, int hops, Interface routeInterface) throws WrongIpAddressFormatException {
-        this.ipAddress = new IpAddress(ipAddress);
+        this(new IpAddress(ipAddress), hops, routeInterface);
+    }
+
+    public RoutingTableRecord(IpAddress ipAddress, int hops, Interface routeInterface) {
+        this(ipAddress, hops, routeInterface, false);
+    }
+
+    public RoutingTableRecord(IpAddress ipAddress, int hops, Interface routeInterface, boolean directConnection) {
+        this.ipAddress = ipAddress;
         this.hops = hops;
         this.routeInterface = routeInterface;
+        this.directConnection = directConnection;
     }
 
     public IpAddress getIpAddress() {
@@ -30,7 +40,7 @@ public final class RoutingTableRecord {
         this.hops = hops;
     }
 
-    public Interface geRouteInterface() {
+    public Interface getRouteInterface() {
         return routeInterface;
     }
 
@@ -38,11 +48,28 @@ public final class RoutingTableRecord {
         this.routeInterface = routeInterface;
     }
 
-    public int getMask() {
-        return mask;
+    public Interface getSourceInterface() {
+        return sourceInterface;
     }
 
-    public void setMask(int mask) {
-        this.mask = mask;
+    public void setSourceInterface(Interface sourceInterface) {
+        this.sourceInterface = sourceInterface;
+    }
+
+    public boolean isDirectConnection() {
+        return directConnection;
+    }
+
+    public void setDirectConnection(boolean directConnection) {
+        this.directConnection = directConnection;
+    }
+
+    public RoutingTableRecordRipData toRipData() {
+        RoutingTableRecordRipData data = new RoutingTableRecordRipData();
+
+        data.setIpAddress(ipAddress);
+        data.setHops(hops);
+
+        return data;
     }
 }

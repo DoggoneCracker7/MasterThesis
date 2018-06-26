@@ -1,9 +1,11 @@
 package com.pl.masterthesis.core;
 
+import com.pl.masterthesis.ui.ControlPanel;
 import com.pl.masterthesis.ui.CopyrightPanel;
 import com.pl.masterthesis.ui.DeviceSelectPanel;
 import com.pl.masterthesis.ui.WorkingSpacePanel;
 import com.pl.masterthesis.utils.Constants;
+import com.pl.masterthesis.utils.SaveLoadController;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,9 +21,11 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         BorderPane rootBorderPane = new BorderPane();
+        WorkingSpacePanel workingSpacePanel = new WorkingSpacePanel();
 
+        rootBorderPane.setCenter(workingSpacePanel);
+        rootBorderPane.setRight(new ControlPanel(primaryStage, new SaveLoadController(workingSpacePanel)));
         rootBorderPane.setLeft(new DeviceSelectPanel());
-        rootBorderPane.setCenter(new WorkingSpacePanel());
         rootBorderPane.setBottom(new CopyrightPanel());
 
         Scene rootScene = new Scene(rootBorderPane, Constants.ROOT_SCENE_WIDTH, Constants.ROOT_SCENE_HEIGHT);

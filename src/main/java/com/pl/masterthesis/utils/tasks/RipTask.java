@@ -1,10 +1,10 @@
 package com.pl.masterthesis.utils.tasks;
 
+import com.pl.masterthesis.core.binding.ConnectionPool;
 import com.pl.masterthesis.models.Connection;
 import com.pl.masterthesis.models.Interface;
 import com.pl.masterthesis.models.Package;
 import com.pl.masterthesis.models.RoutingTable;
-import com.pl.masterthesis.utils.ConnectionPool;
 import com.pl.masterthesis.utils.RipData;
 
 import java.util.Optional;

@@ -1,8 +1,7 @@
 package com.pl.masterthesis.models;
 
-import com.pl.masterthesis.utils.ConnectionPool;
+import com.pl.masterthesis.core.binding.ConnectionPool;
 import com.pl.masterthesis.utils.Constants;
-import com.pl.masterthesis.utils.DeviceReceiveAction;
 import com.pl.masterthesis.utils.RipData;
 import com.pl.masterthesis.utils.exceptions.RouteNotFoundException;
 import com.pl.masterthesis.utils.tasks.RipTask;
@@ -14,30 +13,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class Router extends DeviceReceiveAction {
+public final class Router extends SendReceiveDevice {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private String name;
-    private List<Interface> interfaces;
     private RoutingTable routingTable;
 
     public Router() {
-        interfaces = new ArrayList<>();
+        this("");
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Interface> getInterfaces() {
-        return interfaces;
-    }
-
-    public void setInterfaces(List<Interface> interfaces) {
-        this.interfaces = interfaces;
+    public Router(String name) {
+        setName(name);
     }
 
     public RoutingTable getRoutingTable() {
@@ -50,12 +35,13 @@ public final class Router extends DeviceReceiveAction {
 
     public void addInterface(Interface newInterface) {
         newInterface.setOnReceiveConsumer(this::onReceive);
-        interfaces.add(newInterface);
+        addIoInterface(newInterface);
+        incrementInterfacesIdNumber();
     }
 
     @Override
     public void sendPackage(Package packageToSend) {
-        logger.log(Level.INFO, "Router {0} przesyła pakiet {1}", new Object[]{name, packageToSend.getPackageID()});
+        logger.log(Level.INFO, "Router {0} przesyła pakiet {1}", new Object[]{getName(), packageToSend.getPackageID()});
         try {
             RoutingTableRecord record = routingTable.getRecordByIpAddress(packageToSend.getDestination());
             if (record == null) {
@@ -85,7 +71,7 @@ public final class Router extends DeviceReceiveAction {
 
     @Override
     protected void onRoutingTableUpdateReceived(Package receivedPackage) {
-        logger.log(Level.INFO, "Otrzymano rządzanie uaktualnienia tablicy routingu {0}", name);
+        logger.log(Level.INFO, "Otrzymano rządzanie uaktualnienia tablicy routingu {0}", getName());
         if (receivedPackage.getData() instanceof RipData) {
             RipData ripData = (RipData) receivedPackage.getData();
             routingTable.update(ripData);
@@ -102,14 +88,14 @@ public final class Router extends DeviceReceiveAction {
 
     public void startRip(int delay) {
         initRoutingTable();
-        for (Interface routerInterface : interfaces) {
+        for (Interface routerInterface : getIoInterfaces()) {
             new Timer().scheduleAtFixedRate(new RipTask(routerInterface, routingTable), delay, TimeUnit.SECONDS.toMillis(Constants.ROUTING_TABLE_SEND_INTERVAL));
         }
     }
 
     private void initRoutingTable() {
-        routingTable = new RoutingTable(name);
-        interfaces.forEach(routeInterface -> ConnectionPool.get().getConnection(routeInterface)
+        routingTable = new RoutingTable(getName());
+        getIoInterfaces().forEach(routeInterface -> ConnectionPool.get().getConnection(routeInterface)
                 .map(connection -> new RoutingTableRecord(connection.getIpAddress(), 0, routeInterface, true))
                 .ifPresent(routingTable::addRecord));
     }

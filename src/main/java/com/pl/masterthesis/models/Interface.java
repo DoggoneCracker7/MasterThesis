@@ -1,7 +1,8 @@
 package com.pl.masterthesis.models;
 
-import com.pl.masterthesis.utils.ConnectionPool;
+import com.pl.masterthesis.core.binding.ConnectionPool;
 import com.pl.masterthesis.utils.RipData;
+import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +16,9 @@ public final class Interface {
     private IpAddress ipAddress;
     private Consumer<Package> onReceiveConsumer;
 
+    public Interface(String name, String ipAddress, int mask) throws WrongIpAddressFormatException {
+        this(name,new IpAddress(ipAddress,mask));
+    }
     public Interface(String name, IpAddress ipAddress) {
         this.name = name;
         this.ipAddress = ipAddress;

@@ -13,4 +13,7 @@ public class Constants {
     public static final String STUDENT_IMAGE_URL = "/studentIcon.jpg";
     public static final String ENLARGED_ROUTER_IMAGE_URL = "/routerEnlarged.jpg";
     public static final String ENLARGED_END_DEVICE_IMAGE_URL = "/endDeviceEnlarged.jpg";
+    public static final String GREEN_PLAY_IMAGE_URL = "/greenPlay.jpg";
+    public static final String NET_IMAGE_URL = "/net.jpg";
+    public static final String SAVE_IMAGE_URL = "/save.jpg";
 }

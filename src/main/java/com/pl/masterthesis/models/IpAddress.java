@@ -157,6 +157,14 @@ public final class IpAddress {
     }
 
     @Override
+    public int hashCode() {
+        int result = (int) (address ^ (address >>> 32));
+        result = 31 * result + mask;
+        result = 31 * result + (addressPool ? 1 : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return getAddressAsString() + " / " + mask;
     }

@@ -13,6 +13,10 @@ public final class Connection {
         this(new IpAddress(ipAddress), firstInterface, secondInterface);
     }
 
+    public Connection(String ipAddress, int mask, Interface firstInterface, Interface secondInterface) throws WrongIpAddressFormatException {
+        this(new IpAddress(ipAddress, mask), firstInterface, secondInterface);
+    }
+
     public Connection(IpAddress ipAddress, Interface firstInterface, Interface secondInterface) throws WrongIpAddressFormatException {
         this.ipAddress = ipAddress;
         this.firstInterface = firstInterface;

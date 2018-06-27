@@ -56,15 +56,16 @@ public class WorkingSpacePanel extends Pane {
         deviceConfigDialog.setHeaderText("Wstępna konfiguracja urządzenia");
 
         deviceConfigDialog.showAndWait().ifPresent(deviceIdentifier ->
-                createSendReceiveDeviceModel(mouseEvent.getX(), mouseEvent.getY(), deviceIdentifier));
+                createSendReceiveDeviceModel(mouseEvent.getX(), mouseEvent.getY(), deviceIdentifier, Optional.empty()));
     }
 
-    private void createSendReceiveDeviceModel(double mouseXPosition, double mouseYPosition, String deviceIdentifier) {
+    public void createSendReceiveDeviceModel(double mouseXPosition, double mouseYPosition, String deviceIdentifier,
+                                             Optional<MenuElementType> elementTypeOptional) {
         final Circle deviceUiModel = new Circle(mouseXPosition, mouseYPosition, CIRCLE_RADIOUS);
+        MenuElementType currentElementType = elementTypeOptional.orElseGet(() -> SelectedMenuElement.getInstance().getCurrentlySellectedElement());
 
         deviceUiModel.setId(deviceIdentifier);
-        deviceUiModel.setFill(new ImagePattern(
-                new Image(SelectedMenuElement.getInstance().getCurrentlySellectedElement().getIconToCircleUrl())));
+        deviceUiModel.setFill(new ImagePattern(new Image(currentElementType.getIconToCircleUrl())));
         deviceUiModel.setEffect(new DropShadow(DROPSHADOW_RADIOUS, 0d, 2d, Color.BLACK));
         deviceUiModel.setOnMousePressed(MouseEventController.mousePressedEventHandler);
         deviceUiModel.setOnMouseDragged(MouseEventController.mouseDraggedEventHandler);
@@ -72,7 +73,7 @@ public class WorkingSpacePanel extends Pane {
 
         getChildren().add(deviceUiModel);
         addDeviceUiModelLabel(deviceUiModel);
-        addToDevicePool(deviceUiModel);
+        addToDevicePool(deviceUiModel, currentElementType);
     }
 
     private void onModelMouseClickedEventHandler(Circle deviceUiModel) {
@@ -151,8 +152,8 @@ public class WorkingSpacePanel extends Pane {
         });
     }
 
-    private void configureAndAddConnection(final ConenctionConfigResult connectionConfigResult,
-                                           final Circle startDeviceUiModel, final Circle endDeviceUiModel) throws WrongIpAddressFormatException {
+    public void configureAndAddConnection(final ConenctionConfigResult connectionConfigResult,
+                                          final Circle startDeviceUiModel, final Circle endDeviceUiModel) throws WrongIpAddressFormatException {
         final Line connectionModel = getConnectionUiModel(startDeviceUiModel, endDeviceUiModel,
                 connectionConfigResult.getNetIpAddress(), connectionConfigResult.getMask());
         final Label connectionLabel = getConnectionLabel(startDeviceUiModel, endDeviceUiModel, connectionModel.getId());
@@ -174,8 +175,8 @@ public class WorkingSpacePanel extends Pane {
 
     private void addConnectionToPool(final ConenctionConfigResult connectionConfigResult, final Circle startDeviceUiModel,
                                      final Circle endDeviceUiModel, final Line connectionModel) throws WrongIpAddressFormatException {
-        final Optional<SendReceiveDevice> startDeviceOptional = AddedDevicePool.get().getByModelIdentifier(startDeviceUiModel.getId());
-        final Optional<SendReceiveDevice> endDeviceOptional = AddedDevicePool.get().getByModelIdentifier(endDeviceUiModel.getId());
+        final Optional<SendReceiveDevice> startDeviceOptional = AddedDevicePool.get().getSendReceiveDeviceByIdentifier(startDeviceUiModel.getId());
+        final Optional<SendReceiveDevice> endDeviceOptional = AddedDevicePool.get().getSendReceiveDeviceByIdentifier(endDeviceUiModel.getId());
         if (startDeviceOptional.isPresent() && endDeviceOptional.isPresent()) {
             SendReceiveDevice startDevice = startDeviceOptional.get();
             SendReceiveDevice endDevice = endDeviceOptional.get();
@@ -269,11 +270,10 @@ public class WorkingSpacePanel extends Pane {
     }
 
     @SuppressWarnings("unchecked")
-    private void addToDevicePool(Circle uiModel) {
+    private void addToDevicePool(Circle uiModel, MenuElementType currentElementType) {
         try {
             SendReceiveDevice deviceModel =
-                    (SendReceiveDevice) SelectedMenuElement.getInstance()
-                            .getCurrentlySellectedElement()
+                    (SendReceiveDevice) currentElementType
                             .getModel()
                             .getConstructor(String.class)
                             .newInstance(new Object[]{uiModel.getId()});

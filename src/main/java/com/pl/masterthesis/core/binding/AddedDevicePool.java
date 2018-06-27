@@ -27,13 +27,24 @@ public class AddedDevicePool {
         }
     }
 
-    public Optional<SendReceiveDevice> getByModelIdentifier(String identifier) {
-        Optional<Map.Entry<Circle, SendReceiveDevice>> entryOptional = modelIdentifierDeviceMap.entrySet().stream()
-                .filter(entry -> entry.getValue().getName() == identifier)
-                .findFirst();
+    public Optional<Circle> getUiModelByIdentifier(String identifier) {
+        Optional<Map.Entry<Circle, SendReceiveDevice>> entryOptional = getEntryOptionalByModelIdentifier(identifier);
+        return Optional.ofNullable(entryOptional.isPresent()
+                ? entryOptional.get().getKey()
+                : null);
+    }
+
+    public Optional<SendReceiveDevice> getSendReceiveDeviceByIdentifier(String identifier) {
+        Optional<Map.Entry<Circle, SendReceiveDevice>> entryOptional = getEntryOptionalByModelIdentifier(identifier);
         return Optional.ofNullable(entryOptional.isPresent()
                 ? entryOptional.get().getValue()
                 : null);
+    }
+
+    private Optional<Map.Entry<Circle, SendReceiveDevice>> getEntryOptionalByModelIdentifier(String identifier) {
+        return modelIdentifierDeviceMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getName().equals(identifier))
+                .findFirst();
     }
 
     public String getIdentifierNumber() {

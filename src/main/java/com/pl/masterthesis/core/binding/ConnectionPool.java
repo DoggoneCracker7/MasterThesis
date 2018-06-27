@@ -35,4 +35,8 @@ public final class ConnectionPool {
         }
         return Optional.empty();
     }
+
+    public Map<Connection, Line> getConnectionLineMap() {
+        return connectionLineMap;
+    }
 }

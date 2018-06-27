@@ -13,6 +13,10 @@ public class ConenctionConfigResult {
         this.endRouterInterfaceIpAddress = endRouterInterfaceIpAddress;
     }
 
+    public ConenctionConfigResult(String netAddress, String startRouterInterfaceIpAddress, String endRouterInterfaceIpAddress) {
+        this(Integer.valueOf(netAddress.split("/")[1]), netAddress.split("/")[0], startRouterInterfaceIpAddress, endRouterInterfaceIpAddress);
+    }
+
     public int getMask() {
         return mask;
     }

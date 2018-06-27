@@ -13,6 +13,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class ControlPanel extends VBox {
     public ControlPanel(Stage stage, SaveLoadController saveLoadController) {
         this.saveLoadController = saveLoadController;
         initProperties();
-        getChildren().addAll(getPlayButton(), getSaveNetButton(stage), getLoadNetButton());
+        getChildren().addAll(getPlayButton(), getSaveNetButton(stage), getLoadNetButton(stage));
     }
 
     private void initProperties() {
@@ -40,6 +41,7 @@ public class ControlPanel extends VBox {
         playImageViewButton.setGraphic(playImageView);
         playImageViewButton.setPadding(new Insets(2));
 
+
         return playImageViewButton;
     }
 
@@ -49,22 +51,41 @@ public class ControlPanel extends VBox {
 
         netImageViewButton.setGraphic(netImageView);
         netImageViewButton.setPadding(new Insets(2));
-        netImageViewButton.setOnMouseClicked(event -> chooseFileLocation(stage));
+        netImageViewButton.setOnMouseClicked(event -> choosSaveDirectoryLocation(stage));
 
         return netImageViewButton;
     }
 
-    private Button getLoadNetButton() {
+    private Button getLoadNetButton(Stage stage) {
         final ImageView netImageView = new ImageView(new Image(Constants.NET_IMAGE_URL));
         final Button netImageViewButton = new Button();
 
         netImageViewButton.setGraphic(netImageView);
         netImageViewButton.setPadding(new Insets(2));
+        netImageViewButton.setOnMouseClicked(event -> chooseNetTemplateFile(stage));
 
         return netImageViewButton;
     }
 
-    private void chooseFileLocation(Stage stage) {
+    private void chooseNetTemplateFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+
+        fileChooser.setTitle("Wybierz plik do załadowania szablonu");
+        File chosenFile = fileChooser.showOpenDialog(stage);
+        if (chosenFile == null) {
+            Alert wrongFileTypeAlert = new Alert(Alert.AlertType.ERROR);
+
+            wrongFileTypeAlert.setTitle("Bład podczas wyboru pliku z szablonem");
+            wrongFileTypeAlert.setHeaderText("UWAGA!");
+            wrongFileTypeAlert.setContentText("W celu poprawnego zapisu należy wybrać katalog.");
+
+            wrongFileTypeAlert.show();
+        } else {
+            saveLoadController.loadFileToCurrentWorkspace(chosenFile);
+        }
+    }
+
+    private void choosSaveDirectoryLocation(Stage stage) {
         final DirectoryChooser directoryChooser = new DirectoryChooser();
 
         directoryChooser.setTitle("Wybierz lokalizacji pliku do zapisu");
@@ -73,6 +94,7 @@ public class ControlPanel extends VBox {
             Alert wrongFileTypeAlert = new Alert(Alert.AlertType.ERROR);
 
             wrongFileTypeAlert.setTitle("Bład podczas wyboru folderu do zapisu");
+            wrongFileTypeAlert.setHeaderText("UWAGA!");
             wrongFileTypeAlert.setContentText("W celu poprawnego zapisu należy wybrać katalog.");
 
             wrongFileTypeAlert.show();

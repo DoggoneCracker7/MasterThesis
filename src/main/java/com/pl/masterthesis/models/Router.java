@@ -5,11 +5,10 @@ import com.pl.masterthesis.utils.Constants;
 import com.pl.masterthesis.utils.RipData;
 import com.pl.masterthesis.utils.exceptions.RouteNotFoundException;
 import com.pl.masterthesis.utils.tasks.RipTask;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -47,7 +46,7 @@ public final class Router extends SendReceiveDevice {
             if (record == null) {
                 throw new RouteNotFoundException("Tablica routingu nie posiada informacji na temat trasy do " + packageToSend.getDestination().getAddressAsString());
             }
-            record.getRouteInterface().sendPackage(packageToSend);
+            record.getRouteInterface().sendPackage(packageToSend, getName());
         } catch (RouteNotFoundException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -89,14 +88,18 @@ public final class Router extends SendReceiveDevice {
     public void startRip(int delay) {
         initRoutingTable();
         for (Interface routerInterface : getIoInterfaces()) {
-            new Timer().scheduleAtFixedRate(new RipTask(routerInterface, routingTable), delay, TimeUnit.SECONDS.toMillis(Constants.ROUTING_TABLE_SEND_INTERVAL));
+            Timeline routingAction = new Timeline(new KeyFrame(Duration.seconds(Constants.ROUTING_TABLE_SEND_INTERVAL), event -> {
+                new RipTask(routerInterface, routingTable, getName()).run();
+            }));
+            routingAction.setCycleCount(Timeline.INDEFINITE);
+            routingAction.play();
         }
     }
 
     private void initRoutingTable() {
         routingTable = new RoutingTable(getName());
-        getIoInterfaces().forEach(routeInterface -> ConnectionPool.get().getConnection(routeInterface)
-                .map(connection -> new RoutingTableRecord(connection.getIpAddress(), 0, routeInterface, true))
+        getIoInterfaces().forEach(routeInterface -> ConnectionPool.get().getConnectionLineByInterface(routeInterface)
+                .map(entry -> new RoutingTableRecord(entry.getKey().getIpAddress(), 0, routeInterface, true))
                 .ifPresent(routingTable::addRecord));
     }
 

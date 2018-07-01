@@ -22,16 +22,11 @@ public class SaveLoadController {
     private static final String END_DEVICE = "EndDevice";
     private static final String CONNECTION = "Connection";
     private Logger logger = Logger.getLogger(getClass().getName());
-    private WorkingSpacePanel workingSpacePanel;
-
-    public SaveLoadController(WorkingSpacePanel workingSpacePanel) {
-        this.workingSpacePanel = workingSpacePanel;
-    }
 
     /*
     FILE FORMAT:
     SendReceiveDeviceType   xCoordinate     yCoordinate         identifier
-    Connection              firstDeviceId   firstInterfaceIP    secondInterfaceIP       secondInterfaceIP   netIP
+    Connection              firstDeviceId   firstInterfaceIP    secondInterfaceIP       secondInterfaceIP   netIP   mask
      */
 
     public void saveCurrentView(String directoryPath) {
@@ -63,7 +58,9 @@ public class SaveLoadController {
                     fileContent.append(SPACE);
                 }
             }
-            fileContent.append(entry.getValue().getId());
+            fileContent.append(entry.getValue().getId().split("/")[0]);
+            fileContent.append(SPACE);
+            fileContent.append(entry.getValue().getId().split("/")[1]);
             fileContent.append(ENDLINE);
         });
 
@@ -77,6 +74,7 @@ public class SaveLoadController {
     }
 
     public void loadFileToCurrentWorkspace(File file) {
+        WorkingSpacePanel.get().getChildren().clear();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
             String line = reader.readLine();
             while (line != null) {
@@ -106,7 +104,7 @@ public class SaveLoadController {
         double centerY = Double.valueOf(data[2]);
         String identifier = data[3];
 
-        workingSpacePanel.createSendReceiveDeviceModel(centerX, centerY, identifier,
+        WorkingSpacePanel.get().createSendReceiveDeviceModel(centerX, centerY, identifier,
                 Optional.of(ROUTER.equals(deviceType) ? MenuElementType.ROUTER : MenuElementType.END_DEVICE));
     }
 
@@ -116,11 +114,13 @@ public class SaveLoadController {
         String secondDeviceId = data[3];
         String secondInterfaceIp = data[4];
         String netIp = data[5];
+        int mask = Integer.valueOf(data[6]);
+
         Optional<Circle> firstDeviceUiModelOptional = AddedDevicePool.get().getUiModelByIdentifier(firstDeviceId);
         Optional<Circle> secondDeviceUiModelOptional = AddedDevicePool.get().getUiModelByIdentifier(secondDeviceId);
         if (firstDeviceUiModelOptional.isPresent() && secondDeviceUiModelOptional.isPresent()) {
             try {
-                workingSpacePanel.configureAndAddConnection(new ConenctionConfigResult(netIp, firstInterfaceIp, secondInterfaceIp),
+                WorkingSpacePanel.get().configureAndAddConnection(new ConnectionConfigResult(mask, netIp, firstInterfaceIp, secondInterfaceIp),
                         firstDeviceUiModelOptional.get(), secondDeviceUiModelOptional.get());
             } catch (WrongIpAddressFormatException e) {
                 System.out.println("Błędny format adresu IP: " + e.getMessage());

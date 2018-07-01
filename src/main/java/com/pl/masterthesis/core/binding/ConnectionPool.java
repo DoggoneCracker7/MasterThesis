@@ -26,11 +26,11 @@ public final class ConnectionPool {
         connectionLineMap.put(connection, line);
     }
 
-    public Optional<Connection> getConnection(Interface sourceInterface) {
+    public Optional<Map.Entry<Connection, Line>> getConnectionLineByInterface(Interface sourceInterface) {
         Objects.requireNonNull(sourceInterface, "sourceInterface cannot be null");
-        for (Connection connection : connectionLineMap.keySet()) {
-            if (connection.containsInterface(sourceInterface)) {
-                return Optional.of(connection);
+        for (Map.Entry<Connection, Line> entry : connectionLineMap.entrySet()) {
+            if (entry.getKey().containsInterface(sourceInterface)) {
+                return Optional.of(entry);
             }
         }
         return Optional.empty();

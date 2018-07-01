@@ -12,7 +12,9 @@ public class EndDevice extends SendReceiveDevice {
     }
 
     public EndDevice(Interface inoutInterface, String name) {
-        addIoInterface(inoutInterface);
+        if (inoutInterface != null) {
+            addIoInterface(inoutInterface);
+        }
         setName(name);
         setOnlyOneInterfaceAllowed(true);
     }
@@ -48,7 +50,7 @@ public class EndDevice extends SendReceiveDevice {
         logger.log(Level.INFO, "Pakiet o identyfikatorze {0} jest wysyłany z urządzenia końcowego {1}",
                 new String[]{receivedPackage.getPackageID(), getName()});
         if (getIoInterfaces().size() == 1) {
-            getIoInterfaces().get(0).sendPackage(receivedPackage);
+            getIoInterfaces().get(0).sendPackage(receivedPackage, getName());
         } else {
             logger.log(Level.SEVERE, "Urządzenei końcowe {0} posiada złą konfigurację interfejsów.",
                     new String[]{getName()});

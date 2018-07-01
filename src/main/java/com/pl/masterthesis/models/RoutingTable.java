@@ -62,8 +62,7 @@ public final class RoutingTable {
                             record.setHops(ripRoutingRecord.getHops() + 1);
                         });
             } else {
-                records.add(new RoutingTableRecord(ripRoutingRecord.getIpAddress(), ripRoutingRecord.getHops() + 1, data.getInInterface()))
-                ;
+                records.add(new RoutingTableRecord(ripRoutingRecord.getIpAddress(), ripRoutingRecord.getHops() + 1, data.getInInterface()));
             }
         }
     }
@@ -90,7 +89,7 @@ public final class RoutingTable {
             System.out.println("---------------------------------------------------------------------------------------------------");
             for (RoutingTableRecord record : records) {
                 String line = "";
-                line += getTextInTheMiddle(record.getIpAddress().getAddressAsString(), 32) + "|";
+                line += getTextInTheMiddle(record.getIpAddress().toString(), 32) + "|";
                 line += getTextInTheMiddle(String.valueOf(record.getHops()), 32) + "|";
                 line += getTextInTheMiddle(record.getRouteInterface().getIpAddress().toString(), 33) + "|";
                 System.out.println(line);

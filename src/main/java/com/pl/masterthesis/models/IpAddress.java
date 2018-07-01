@@ -166,6 +166,6 @@ public final class IpAddress {
 
     @Override
     public String toString() {
-        return getAddressAsString() + " / " + mask;
+        return getAddressAsString() + "/" + mask;
     }
 }

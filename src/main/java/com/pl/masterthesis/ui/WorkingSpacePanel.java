@@ -32,8 +32,13 @@ public class WorkingSpacePanel extends Pane {
     private static final double IDENTIFIER_LABEL_WIDTH = CIRCLE_RADIOUS * 2;
     private static final double IDENTIFIER_LABEL_HEIGHT = 20;
     private static final double INTERFACE_MODEL_RADIOUS = 5;
+    private static final WorkingSpacePanel INSTANCE = new WorkingSpacePanel();
 
-    public WorkingSpacePanel() {
+    public static WorkingSpacePanel get() {
+        return INSTANCE;
+    }
+
+    private WorkingSpacePanel() {
         setOnMouseClicked(this::onPaneMouseClickedHandler);
     }
 
@@ -96,7 +101,7 @@ public class WorkingSpacePanel extends Pane {
     }
 
     private void showConnectionConfigDialog(final Circle deviceUiModel) {
-        final Dialog<ConenctionConfigResult> connectionConfigDialog = new Dialog<>();
+        final Dialog<ConnectionConfigResult> connectionConfigDialog = new Dialog<>();
         final Circle startDeviceUiModel = ConnectionBuffer.getBufferedNode();
         final Circle endDeviceUiModel = deviceUiModel;
         final GridPane formGridPane = new GridPane();
@@ -123,7 +128,7 @@ public class WorkingSpacePanel extends Pane {
 
         connectionConfigDialog.setResultConverter(dialogButton -> {
             if (dialogButton.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                return new ConenctionConfigResult(
+                return new ConnectionConfigResult(
                         Integer.valueOf(maskTextField.getText()),
                         networkAddressTextField.getText(),
                         startRouterInterfaceAddress.getText(),
@@ -152,7 +157,7 @@ public class WorkingSpacePanel extends Pane {
         });
     }
 
-    public void configureAndAddConnection(final ConenctionConfigResult connectionConfigResult,
+    public void configureAndAddConnection(final ConnectionConfigResult connectionConfigResult,
                                           final Circle startDeviceUiModel, final Circle endDeviceUiModel) throws WrongIpAddressFormatException {
         final Line connectionModel = getConnectionUiModel(startDeviceUiModel, endDeviceUiModel,
                 connectionConfigResult.getNetIpAddress(), connectionConfigResult.getMask());
@@ -173,7 +178,7 @@ public class WorkingSpacePanel extends Pane {
         ConnectionBuffer.clear();
     }
 
-    private void addConnectionToPool(final ConenctionConfigResult connectionConfigResult, final Circle startDeviceUiModel,
+    private void addConnectionToPool(final ConnectionConfigResult connectionConfigResult, final Circle startDeviceUiModel,
                                      final Circle endDeviceUiModel, final Line connectionModel) throws WrongIpAddressFormatException {
         final Optional<SendReceiveDevice> startDeviceOptional = AddedDevicePool.get().getSendReceiveDeviceByIdentifier(startDeviceUiModel.getId());
         final Optional<SendReceiveDevice> endDeviceOptional = AddedDevicePool.get().getSendReceiveDeviceByIdentifier(endDeviceUiModel.getId());
@@ -187,7 +192,8 @@ public class WorkingSpacePanel extends Pane {
             startDevice.addIoInterface(startInterface);
             endDevice.addIoInterface(endInterface);
             ConnectionPool.get().addConnection(
-                    new Connection(connectionConfigResult.getNetIpAddress(), startInterface, endInterface), connectionModel);
+                    new Connection(connectionConfigResult.getNetIpAddress(), connectionConfigResult.getMask(),
+                            startInterface, endInterface), connectionModel);
         }
     }
 

@@ -1,9 +1,12 @@
 package com.pl.masterthesis.models;
 
 import com.pl.masterthesis.core.binding.ConnectionPool;
+import com.pl.masterthesis.utils.AnimationUtils;
 import com.pl.masterthesis.utils.RipData;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
+import javafx.scene.shape.Line;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -17,8 +20,9 @@ public final class Interface {
     private Consumer<Package> onReceiveConsumer;
 
     public Interface(String name, String ipAddress, int mask) throws WrongIpAddressFormatException {
-        this(name,new IpAddress(ipAddress,mask));
+        this(name, new IpAddress(ipAddress, mask));
     }
+
     public Interface(String name, IpAddress ipAddress) {
         this.name = name;
         this.ipAddress = ipAddress;
@@ -56,9 +60,9 @@ public final class Interface {
         onReceiveConsumer.accept(receivedPackage);
     }
 
-    public void sendPackage(Package packageToSend) {
-        Optional<Connection> connection = ConnectionPool.get().getConnection(this);
-        if (connection.isPresent()) {
+    public void sendPackage(Package packageToSend, String sourceDeviceIdentifier) {
+        Optional<Map.Entry<Connection, Line>> connectionOptional = ConnectionPool.get().getConnectionLineByInterface(this);
+        if (connectionOptional.isPresent()) {
             if (packageToSend.isRoutingTable()) {
                 logger.log(Level.INFO, "Przez interfejs pod adresem {0} wysyłana jest tablica routingu",
                         new String[]{ipAddress.getAddressAsString()});
@@ -67,7 +71,8 @@ public final class Interface {
                         new String[]{ipAddress.getAddressAsString(), packageToSend.getPackageID(),
                                 packageToSend.getDestination().getAddressAsString()});
             }
-            connection.get().transferPackage(this, packageToSend);
+            AnimationUtils.packageSendAnimation(connectionOptional.get().getValue(), sourceDeviceIdentifier,
+                    () -> connectionOptional.get().getKey().transferPackage(this, packageToSend));
         } else {
             logger.log(Level.WARNING, "ConnectionPool nie posiada konfiguracji na temat trasy do {0}",
                     packageToSend.getDestination());

@@ -21,10 +21,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         BorderPane rootBorderPane = new BorderPane();
-        WorkingSpacePanel workingSpacePanel = new WorkingSpacePanel();
 
-        rootBorderPane.setCenter(workingSpacePanel);
-        rootBorderPane.setRight(new ControlPanel(primaryStage, new SaveLoadController(workingSpacePanel)));
+        rootBorderPane.setCenter(WorkingSpacePanel.get());
+        rootBorderPane.setRight(new ControlPanel(primaryStage, new SaveLoadController()));
         rootBorderPane.setLeft(new DeviceSelectPanel());
         rootBorderPane.setBottom(new CopyrightPanel());
 

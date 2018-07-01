@@ -48,8 +48,13 @@ public abstract class SendReceiveDevice {
     }
 
     public void addIoInterface(Interface newInterface) {
+        newInterface.setOnReceiveConsumer(this::onReceive);
         if (hasOnlyOneInterfaceAllowed()) {
-            ioInterfaces.set(0, newInterface);
+            if (ioInterfaces.isEmpty()) {
+                ioInterfaces.add(newInterface);
+            } else {
+                ioInterfaces.set(0, newInterface);
+            }
         } else {
             ioInterfaces.add(newInterface);
         }

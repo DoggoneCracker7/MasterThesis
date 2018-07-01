@@ -1,10 +1,14 @@
 package com.pl.masterthesis.ui;
 
+import com.pl.masterthesis.core.binding.AddedDevicePool;
+import com.pl.masterthesis.models.Router;
 import com.pl.masterthesis.utils.Constants;
 import com.pl.masterthesis.utils.SaveLoadController;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -15,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 
@@ -40,7 +45,7 @@ public class ControlPanel extends VBox {
 
         playImageViewButton.setGraphic(playImageView);
         playImageViewButton.setPadding(new Insets(2));
-
+        playImageViewButton.setOnMouseClicked(event -> startRip());
 
         return playImageViewButton;
     }
@@ -51,7 +56,7 @@ public class ControlPanel extends VBox {
 
         netImageViewButton.setGraphic(netImageView);
         netImageViewButton.setPadding(new Insets(2));
-        netImageViewButton.setOnMouseClicked(event -> choosSaveDirectoryLocation(stage));
+        netImageViewButton.setOnMouseClicked(event -> chooseSaveDirectoryLocation(stage));
 
         return netImageViewButton;
     }
@@ -85,7 +90,7 @@ public class ControlPanel extends VBox {
         }
     }
 
-    private void choosSaveDirectoryLocation(Stage stage) {
+    private void chooseSaveDirectoryLocation(Stage stage) {
         final DirectoryChooser directoryChooser = new DirectoryChooser();
 
         directoryChooser.setTitle("Wybierz lokalizacji pliku do zapisu");
@@ -101,5 +106,13 @@ public class ControlPanel extends VBox {
         } else {
             saveLoadController.saveCurrentView(chosenFile.getAbsolutePath());
         }
+    }
+
+    private void startRip() {
+        AddedDevicePool.get().getModelIdentifierDeviceMap().values().forEach(sendReceiveDevice -> {
+            if (sendReceiveDevice instanceof Router) {
+                ((Router) sendReceiveDevice).startRip();
+            }
+        });
     }
 }

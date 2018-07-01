@@ -1,19 +1,19 @@
 package com.pl.masterthesis.utils;
 
-public class ConenctionConfigResult {
+public class ConnectionConfigResult {
     private int mask;
     private String netIpAddress;
     private String startRouterInterfaceIpAddress;
     private String endRouterInterfaceIpAddress;
 
-    public ConenctionConfigResult(int mask, String netIpAddress, String startRouterInterfaceIpAddress, String endRouterInterfaceIpAddress) {
+    public ConnectionConfigResult(int mask, String netIpAddress, String startRouterInterfaceIpAddress, String endRouterInterfaceIpAddress) {
         this.mask = mask;
         this.netIpAddress = netIpAddress;
         this.startRouterInterfaceIpAddress = startRouterInterfaceIpAddress;
         this.endRouterInterfaceIpAddress = endRouterInterfaceIpAddress;
     }
 
-    public ConenctionConfigResult(String netAddress, String startRouterInterfaceIpAddress, String endRouterInterfaceIpAddress) {
+    public ConnectionConfigResult(String netAddress, String startRouterInterfaceIpAddress, String endRouterInterfaceIpAddress) {
         this(Integer.valueOf(netAddress.split("/")[1]), netAddress.split("/")[0], startRouterInterfaceIpAddress, endRouterInterfaceIpAddress);
     }
 

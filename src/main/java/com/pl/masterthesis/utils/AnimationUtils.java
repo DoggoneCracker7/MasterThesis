@@ -1,6 +1,7 @@
 package com.pl.masterthesis.utils;
 
 import com.pl.masterthesis.core.binding.AddedDevicePool;
+import com.pl.masterthesis.models.Package;
 import com.pl.masterthesis.ui.WorkingSpacePanel;
 import javafx.animation.TranslateTransition;
 import javafx.scene.image.Image;
@@ -18,7 +19,8 @@ public class AnimationUtils {
     private final static double ENVELOPE_MODEL_HEIGHT = 50;
 
 
-    public static void packageSendAnimation(Line connectionModel, String sourceDeviceIdentifier, Command onFinishCommand) {
+    public static void packageSendAnimation(Line connectionModel, String sourceDeviceIdentifier, Package packageToSend,
+                                            Command onFinishCommand) {
         Optional<Circle> deviceUiModelOptional = AddedDevicePool.get().getUiModelByIdentifier(sourceDeviceIdentifier);
         if (deviceUiModelOptional.isPresent()) {
             Circle deviceUiModel = deviceUiModelOptional.get();
@@ -31,7 +33,7 @@ public class AnimationUtils {
             double endY = deviceUiModel.getCenterY() == connectionModel.getStartY()
                     ? connectionModel.getEndY()
                     : connectionModel.getStartY();
-            Rectangle envelopeModel = getEnvelopeModel(startX, startY);
+            Rectangle envelopeModel = getEnvelopeModel(startX, startY, packageToSend);
 
             WorkingSpacePanel.get().getChildren().add(envelopeModel);
             translateTransition.setDuration(Duration.seconds(Constants.TRANSITION_TIME));
@@ -41,7 +43,6 @@ public class AnimationUtils {
             translateTransition.setAutoReverse(false);
             translateTransition.play();
             translateTransition.setOnFinished(event -> {
-                System.out.println("Skończyłem na podłodze");
                 WorkingSpacePanel.get().getChildren().remove(envelopeModel);
                 onFinishCommand.execute();
             });
@@ -51,15 +52,29 @@ public class AnimationUtils {
         }
     }
 
-    private static Rectangle getEnvelopeModel(double x, double y) {
+    private static Rectangle getEnvelopeModel(double x, double y, Package packageToSend) {
         Rectangle envelopeModel = new Rectangle();
 
         envelopeModel.setWidth(ENVELOPE_MODEL_WIDTH);
         envelopeModel.setHeight(ENVELOPE_MODEL_HEIGHT);
-        envelopeModel.setFill(new ImagePattern(new Image(Constants.RIP_ENVELOPE_IMAGE_URL)));
+        envelopeModel.setFill(new ImagePattern(new Image(getEnvelopeImageURL(packageToSend))));
         envelopeModel.setX(x - Constants.CIRCLE_RADIOUS / 2);
         envelopeModel.setY(y - Constants.CIRCLE_RADIOUS / 2);
 
         return envelopeModel;
+    }
+
+    private static String getEnvelopeImageURL(Package packageToSend) {
+        if (packageToSend.isFailure()) {
+            return Constants.FAILURE_ENVELOPE_IMAGE_URL;
+        }
+        if (packageToSend.isRoutingTable()) {
+            return Constants.RIP_ENVELOPE_IMAGE_URL;
+        }
+        if (packageToSend.isAck()) {
+            return Constants.ACK_ENVELOPE_IMAGE_URL;
+        }
+
+        return Constants.REGULAR_ENVELOPE_IMAGE_URL;
     }
 }

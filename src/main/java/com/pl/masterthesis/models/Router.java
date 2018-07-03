@@ -9,6 +9,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
 
+import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +23,7 @@ public final class Router extends SendReceiveDevice {
     }
 
     public Router(String name) {
+        initRoutingTable();
         setName(name);
     }
 
@@ -48,6 +51,13 @@ public final class Router extends SendReceiveDevice {
             }
             record.getRouteInterface().sendPackage(packageToSend, getName());
         } catch (RouteNotFoundException e) {
+            RoutingTableRecord record = routingTable.getRecordByIpAddress(packageToSend.getSource());
+            Package<String> failureAckPackage = new Package<>();
+
+            failureAckPackage.setDestination(packageToSend.getSource());
+            failureAckPackage.setFailure(true);
+            record.getRouteInterface().sendPackage(failureAckPackage, getName());
+
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
@@ -96,7 +106,19 @@ public final class Router extends SendReceiveDevice {
         }
     }
 
-    private void initRoutingTable() {
+    public Optional<RoutingTableRecord> getRoutingTableRecordForIpAddress(IpAddress ipAddressToCheck) {
+        Objects.requireNonNull(ipAddressToCheck, "ipAddressToCheck == null");
+
+        for (RoutingTableRecord record : routingTable.getRecords()) {
+            if (record.getIpAddress().containsAddress(ipAddressToCheck)) {
+                return Optional.of(record);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public void initRoutingTable() {
         routingTable = new RoutingTable(getName());
         getIoInterfaces().forEach(routeInterface -> ConnectionPool.get().getConnectionLineByInterface(routeInterface)
                 .map(entry -> new RoutingTableRecord(entry.getKey().getIpAddress(), 0, routeInterface, true))

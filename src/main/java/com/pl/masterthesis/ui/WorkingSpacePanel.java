@@ -2,9 +2,8 @@ package com.pl.masterthesis.ui;
 
 import com.pl.masterthesis.core.binding.AddedDevicePool;
 import com.pl.masterthesis.core.binding.ConnectionPool;
-import com.pl.masterthesis.models.Connection;
-import com.pl.masterthesis.models.Interface;
-import com.pl.masterthesis.models.SendReceiveDevice;
+import com.pl.masterthesis.models.*;
+import com.pl.masterthesis.models.Package;
 import com.pl.masterthesis.utils.*;
 import com.pl.masterthesis.utils.enums.MenuElementType;
 import com.pl.masterthesis.utils.exceptions.WrongIpAddressFormatException;
@@ -85,8 +84,19 @@ public class WorkingSpacePanel extends Pane {
         switch (SelectedMenuElement.getInstance().getCurrentlySellectedElement()) {
             case LEAVE:
                 break;
-            case DELETE:
-                getChildren().remove(deviceUiModel);
+            case SEND:
+                Optional<SendReceiveDevice> currentlySelectedDeviceOptional =
+                        AddedDevicePool.get().getSendReceiveDeviceByIdentifier(deviceUiModel.getId());
+                if (currentlySelectedDeviceOptional.isPresent()) {
+                    SendReceiveDevice currentlySelectedDevice = currentlySelectedDeviceOptional.get();
+                    if (PackageSendNode.isEmpty()) {
+                        PackageSendNode.setBufferedNode(currentlySelectedDevice);
+                    } else {
+                        prepareAndSendPackage(currentlySelectedDevice);
+                    }
+                } else {
+                    System.out.println("Błąd. Nie znaleziono w dodanych urządzeniach urządzania o identyfikatorze: " + deviceUiModel.getId());
+                }
                 break;
             case CABLE:
                 if (ConnectionBuffer.isEmpty()) {
@@ -97,6 +107,47 @@ public class WorkingSpacePanel extends Pane {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void prepareAndSendPackage(SendReceiveDevice currentlySelecedDevice) {
+        Optional<Interface> bestOutInterfaceForStartDevice =
+                findBestOutInterface(PackageSendNode.getBufferedNode(), currentlySelecedDevice);
+        Optional<Interface> bestOutInterfaceForEndDevice =
+                findBestOutInterface(currentlySelecedDevice, PackageSendNode.getBufferedNode());
+
+        if (bestOutInterfaceForStartDevice.isPresent() && bestOutInterfaceForEndDevice.isPresent()) {
+            Package<String> packageToSend = new Package<>();
+
+            packageToSend.setSource(bestOutInterfaceForStartDevice.get().getIpAddress());
+            packageToSend.setDestination(bestOutInterfaceForEndDevice.get().getIpAddress());
+            bestOutInterfaceForStartDevice.get().sendPackage(packageToSend, PackageSendNode.getBufferedNode().getName());
+        } else {
+            System.out.println("Nie istnieje konfiguracja na połączenie urządzenia " + PackageSendNode.getBufferedNode().getName()
+                    + " i " + currentlySelecedDevice.getName());
+        }
+        PackageSendNode.clear();
+    }
+
+    private Optional<Interface> findBestOutInterface(SendReceiveDevice startDevice, SendReceiveDevice endDevice) {
+        int startDeviceInterfacesAmount = startDevice.getIoInterfaces().size();
+        if (startDeviceInterfacesAmount == 1) {
+            return Optional.of(startDevice.getIoInterfaces().get(0));
+        } else if (startDeviceInterfacesAmount > 1 && startDevice instanceof Router) {
+            Router router = (Router) startDevice;
+            Interface bestWayInterface = null;
+            int minHops = Integer.MAX_VALUE;
+
+            for (Interface ioInterface : endDevice.getIoInterfaces()) {
+                Optional<RoutingTableRecord> routingTableRecordOptional = router.getRoutingTableRecordForIpAddress(ioInterface.getIpAddress());
+                if (routingTableRecordOptional.isPresent() && routingTableRecordOptional.get().getHops() < minHops) {
+                    bestWayInterface = routingTableRecordOptional.get().getRouteInterface();
+                }
+            }
+
+            return Optional.ofNullable(bestWayInterface);
+        } else {
+            return Optional.empty();
         }
     }
 

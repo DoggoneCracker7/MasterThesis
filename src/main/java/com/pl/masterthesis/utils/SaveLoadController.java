@@ -93,6 +93,11 @@ public class SaveLoadController {
                 }
                 line = reader.readLine();
             }
+            AddedDevicePool.get().getModelIdentifierDeviceMap().values().forEach(device -> {
+                if (device instanceof Router) {
+                    ((Router) device).initRoutingTable();
+                }
+            });
         } catch (IOException e) {
             System.out.println("Błąd podczas przetwarzania pliku: " + e.getMessage());
         }

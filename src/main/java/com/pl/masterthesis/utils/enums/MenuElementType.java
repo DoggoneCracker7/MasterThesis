@@ -9,8 +9,8 @@ public enum MenuElementType {
     ROUTER("ROUTER", Constants.ROUTER_IMAGE_URL, Constants.ENLARGED_ROUTER_IMAGE_URL, Router.class),
     END_DEVICE("END_DEVICE", Constants.END_DEVICE_IMAGE_URL, Constants.ENLARGED_END_DEVICE_IMAGE_URL, EndDevice.class),
     CABLE("CABLE", Constants.CABLE_IMAGE_URL, Connection.class),
-    DELETE("DELETE", Constants.DELETE_IMAGE_URL),
-    LEAVE("LEAVE", Constants.LEAVE_IMAGE_URL);
+    LEAVE("LEAVE", Constants.LEAVE_IMAGE_URL),
+    SEND("SEND", Constants.ENVELOPE_100x100_IMAGE_URL);
 
     private String name;
     private String iconUrl;

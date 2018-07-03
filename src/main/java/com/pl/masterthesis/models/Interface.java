@@ -71,7 +71,7 @@ public final class Interface {
                         new String[]{ipAddress.getAddressAsString(), packageToSend.getPackageID(),
                                 packageToSend.getDestination().getAddressAsString()});
             }
-            AnimationUtils.packageSendAnimation(connectionOptional.get().getValue(), sourceDeviceIdentifier,
+            AnimationUtils.packageSendAnimation(connectionOptional.get().getValue(), sourceDeviceIdentifier, packageToSend,
                     () -> connectionOptional.get().getKey().transferPackage(this, packageToSend));
         } else {
             logger.log(Level.WARNING, "ConnectionPool nie posiada konfiguracji na temat trasy do {0}",

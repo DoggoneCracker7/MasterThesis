@@ -10,6 +10,7 @@ public final class Package<T> {
     private boolean reachedDestination;
     private String packageID;
     private boolean isRoutingTable;
+    private boolean failure;
 
 
     public int getTTL() {
@@ -97,5 +98,16 @@ public final class Package<T> {
 
     public void setRoutingTable(boolean routingTable) {
         isRoutingTable = routingTable;
+    }
+
+    public boolean isFailure() {
+        return failure;
+    }
+
+    public void setFailure(boolean failure) {
+        this.failure = failure;
+        if (failure) {
+            this.ack = true;
+        }
     }
 }
